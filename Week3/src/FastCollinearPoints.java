@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;
@@ -14,37 +16,86 @@ import edu.princeton.cs.algs4.StdOut;
  *
  *****************************************************************************/
 public class FastCollinearPoints {
-	private ArrayList<LineSegment> lines;
+	private ArrayList<LineSegment> lines; 		// Where segments will be stored
 	
+	/**
+	 * Constructor for the Brute Collinear Points class 
+	 * @param points The points that will be checked for connected segments
+	 */
 	public FastCollinearPoints(Point[] points) {
-		lines = new ArrayList<LineSegment>();
-		if (points == null) {
+		if(points == null) {
 			throw new java.lang.IllegalArgumentException();
 		}
 		
-		for (int i = 0; i < points.length; i = i + 4) {
-			Point p = points[i]; 
-			Point q = points[i + 1];
-			Point r = points[i + 2]; 
-			Point s = points[i + 3];
-			if (p == null || q == null || r == null || s == null) {
+		for(int i = 0; i < points.length; i++) {
+			if(points[i] == null) {
 				throw new java.lang.IllegalArgumentException();
 			}
-			if (p.slopeTo(q) == p.slopeTo(r) && p.slopeTo(q) == p.slopeTo(s)) {
-				lines.add(new LineSegment(p, s));
+		}
+		
+		if(checkDuplicates(points)) {
+			throw new java.lang.IllegalArgumentException();
+		}
+		
+		Point[] adjPoints = Arrays.copyOf(points, points.length);
+		lines = new ArrayList<LineSegment>();
+		for(int i = 0; i < adjPoints.length - 3; i ++) {
+			Arrays.sort(adjPoints, adjPoints[i].slopeOrder());
+			int counter = 0; 
+			for(int j = i + 1; j < i + 2; j ++) {
+				if(adjPoints[i].slopeTo(adjPoints[j]) != adjPoints[i].slopeTo(adjPoints[j + 1])) {
+					counter = 1; 
+				}
+			}
+			if(counter != 1) {
+				lines.add(new LineSegment(adjPoints[i], adjPoints[i + 3]));
+			}
+			else {
+				counter = 0; 
 			}
 		}
+		
 	}
 	
+	
+	/**
+	 * This method checks for duplicate values in the Point array
+	 * @param points the array to iterate over and check for duplicates
+	 * @return true if there is a duplicate 
+	 */
+	private boolean checkDuplicates(Point[] points) {
+		for (int i = 0; i < points.length - 1; i++) {
+			for (int j = i + 1; j < points.length; j++) {
+				if (points[i].compareTo(points[j]) == 0) {
+					return true; 
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns the number of connected segments in the inputs 
+	 * @return int the number of segments connected in the input values 
+	 */
 	public int numberOfSegments() {
 		return lines.size();
 	}
 	
+	/**
+	 * Returns the segments that are connected, p->q->r->s
+	 * The output is in the for p->s or s->p
+	 * @return LineSegment[] with all the connected points 
+	 */
 	public LineSegment[] segments() {
 		LineSegment[] answer = new LineSegment[lines.size()];
 		return lines.toArray(answer);
 	}
 	
+	/**
+	 * Main Function 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 
 	    // read the n points from a file
@@ -76,3 +127,4 @@ public class FastCollinearPoints {
 	}
 
 }
+
