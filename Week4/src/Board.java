@@ -1,3 +1,11 @@
+/******************************************************************************
+ * Algorithms Part I: Week 4
+ * Problem: Create an immutable data type Board 
+ * Created: Tuesday, March 13th, 2018
+ * Last Edit: Tuesday, March 13th, 2018
+ * @author markestudillo
+ *
+ *****************************************************************************/
 
 public class Board {
 	
