@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdOut;
 
 /******************************************************************************
@@ -16,7 +17,10 @@ public class Solver {
 	 * @param initial board to solve
 	 */
 	public Solver(Board initial) {
-		
+		if(initial == null) {
+			throw new java.lang.IllegalArgumentException();
+		}
+		MinPQ<Board> answer = new MinPQ<Board>();
 	}
 	
 	/**
