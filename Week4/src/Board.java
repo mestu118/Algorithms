@@ -11,8 +11,8 @@ import java.util.Stack;
  *****************************************************************************/
 
 public class Board {
-	private int[][] tiles; 
-	private int n; 
+	final private int[][] tiles; 
+	final private int n; 
 	
 	/**
 	 *  Constructs a board from an n-by-n array blocks
@@ -20,8 +20,9 @@ public class Board {
 	 * @param blocks n-by-n array of blocks
 	 */
 	public Board(int[][] blocks) {
-		this.tiles = blocks;
-		this.n = blocks.length; 
+		int[][] temp = Arrays.copyOf(blocks, blocks.length);
+		this.tiles = temp;
+		this.n = tiles.length; 
 	}
 	
 	/**
@@ -64,7 +65,7 @@ public class Board {
 		return distance; 
 	}
 	
-	public int calculateDistance(int row, int col) {
+	private int calculateDistance(int row, int col) {
 		if(this.tiles[row][col] == 0) {
 			return 0; 
 		}
@@ -79,7 +80,7 @@ public class Board {
 		for(int row = 0; row < n; row++) {
 			for(int col = 0; col < n; col++) {
 				int location = n*row + col + 1; 
-				if(this.tiles[row][col] != location) {
+				if(this.tiles[row][col] != 0 && this.tiles[row][col] != location) {
 					return false; 
 				}
 			}
@@ -169,7 +170,7 @@ public class Board {
 	 * @param newRow The column of the second value to be switched
 	 * @return int[][] 2-D array with the values switched 
 	 */
-	public int[][] swapping(int oldCol, int oldRow, int newCol, int newRow){
+	private int[][] swapping(int oldCol, int oldRow, int newCol, int newRow){
 		int[][] answer = Arrays.copyOf(this.tiles, this.n);
 		int temp = answer[oldRow][oldCol]; 
 		answer[oldRow][oldCol] = answer[newRow][newCol];
@@ -183,10 +184,10 @@ public class Board {
 	 */
 	public String toString() {
 		StringBuilder s = new StringBuilder(); 
-		s.append(n + "\n");
+		s.append(this.n + "\n");
 		for(int i = 0; i < n; i++) {
 			for(int j = 0; j < n; j++) {
-				s.append(String.format("%2d", tiles[i][j])); 
+				s.append(String.format("%2d", this.tiles[i][j])); 
 			}
 			s.append("\n");
 		}

@@ -1,3 +1,5 @@
+import java.util.Stack;
+
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdOut;
@@ -8,10 +10,9 @@ import edu.princeton.cs.algs4.StdOut;
  * Created: Tuesday, March 13th, 2018
  * Last Edit: Tuesday, March 13th, 2018
  * @author markestudillo
- *
  *****************************************************************************/
 public class Solver {
-	
+	private CompBoards recentMove; 
 	/**
 	 * Final solution to the initial board (Using the A* algorithm)
 	 * @param initial board to solve
@@ -20,7 +21,59 @@ public class Solver {
 		if(initial == null) {
 			throw new java.lang.IllegalArgumentException();
 		}
-		MinPQ<Board> answer = new MinPQ<Board>();
+		MinPQ<CompBoards> answer = new MinPQ<CompBoards>();
+		MinPQ<CompBoards> answerTwin = new MinPQ<CompBoards>();
+		
+		answer.insert(new CompBoards(initial));
+		answerTwin.insert(new CompBoards(initial.twin()));
+		
+		while(true) {
+			recentMove = check(answer); 
+			if(recentMove != null || check(answerTwin) != null) {
+				return;
+			}
+		}
+	}
+	
+	private CompBoards check(MinPQ<CompBoards> moves) {
+		if(moves.isEmpty()) {
+			return null;
+		}
+		
+		CompBoards best = moves.delMin();
+		
+		if(best.board.isGoal()) {
+			return best; 
+		}
+		
+		for(Board board : best.board.neighbors()) {
+			if(best.prev == null || !board.equals(best.prev.board)) {
+				moves.insert(new CompBoards(board, best));
+			}
+		}
+		return null;
+	}
+	
+	private class CompBoards implements Comparable<CompBoards> {
+		private CompBoards prev; 
+		final private Board board; 
+		private int numMoves = 0; 
+		
+		public CompBoards(Board board) {
+			this.board = board;
+		}
+		
+		public CompBoards(Board board, CompBoards previous) {
+			this.prev = previous;
+			this.board = board; 
+			this.numMoves = previous.numMoves + 1; 
+		}
+
+		public int compareTo(CompBoards com) {
+			return (this.board.manhattan() - com.board.manhattan()) + (this.numMoves + com.numMoves);
+		
+		}
+		
 	}
 	
 	/**
@@ -28,7 +81,7 @@ public class Solver {
 	 * @return boolean is it solvable? 
 	 */
 	public boolean isSolvable() {
-		return false;
+		return recentMove != null;
 	}
 	
 	/**
@@ -36,7 +89,7 @@ public class Solver {
 	 * @return int number of moves to solve the board 
 	 */
 	public int moves() {
-		return 0; 
+		return this.isSolvable() ? recentMove.numMoves : -1; 
 	}
 	
 	/**
@@ -44,7 +97,15 @@ public class Solver {
 	 * @return Iterable 
 	 */
 	public Iterable<Board> solution() {
-		return null; 
+		if(!this.isSolvable()) {
+			return null;
+		}
+		Stack<Board> moves = new Stack<Board>();
+		while(recentMove != null) {
+			moves.push(recentMove.board);
+			recentMove = recentMove.prev;
+		}
+		return moves; 
 	}
 	
 	public static void main(String[] args) {
@@ -53,9 +114,11 @@ public class Solver {
 	    In in = new In(args[0]);
 	    int n = in.readInt();
 	    int[][] blocks = new int[n][n];
-	    for (int i = 0; i < n; i++)
-	        for (int j = 0; j < n; j++)
+	    for (int i = 0; i < n; i++) {
+	        for (int j = 0; j < n; j++) {
 	            blocks[i][j] = in.readInt();
+	        }
+	    }
 	    Board initial = new Board(blocks);
 
 	    // solve the puzzle
