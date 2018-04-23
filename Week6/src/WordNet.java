@@ -8,41 +8,29 @@ import edu.princeton.cs.algs4.Digraph;
 public class WordNet {
 	private final HashMap<String, Bag<Integer>> _synsetsToId;
 	private final HashMap<Integer, String> _IdtoSynset;
-	private int _sizeSynset;
 	private Digraph _digraphHyper;
 	private final SAP _sap;
+	
 	// constructor takes the name of the two input files
 	public WordNet(String synsets, String hypernyms) {
 		// Instantiating the _synset data structure 
 		this._synsetsToId = new HashMap<String, Bag<Integer>>();
 		this._IdtoSynset = new HashMap<Integer, String>();
 		
-		//Checking for null objects
- 		if (synsets == null || hypernyms == null) {
-			   // throw IllegalArgumentException if input is not a rooted DAG
-		   throw new java.lang.IllegalArgumentException();
-	   }
- 		
- 		// Reading in files 
-	   In inSyn = new In(synsets);
-	   In inHyp = new In(hypernyms);
-	   
-	   // Reading all lines from synsets and hypernyms 
-	   String[] allSynsets = inSyn.readAllLines();
-	   String[] allHypernyms = inHyp.readAllLines();
-	   
 	   //Putting all of the synsets in the _synset data strucutre 
-	   putInSyn(allSynsets);
-	   
-	   //instantiating _hypernyms with the size of _synsets 
-	   _digraphHyper = new Digraph(_IdtoSynset.size());
-	   
+	   putInSyn(synsets);
 	   //Putting all of the values of hypernyms into _hypernyms
-	   	putInHyp(allHypernyms);
+	   	putInHyp(hypernyms);
 	   	_sap = new SAP(_digraphHyper);
 	}
 	
-	private void putInSyn(String[] allVals) {
+	private void putInSyn(String synsets) {
+		if(synsets == null) {
+			throw new java.lang.IllegalArgumentException();
+		}
+		In inSyn = new In(synsets);
+		String[] allVals = inSyn.readAllLines();
+		
 		Bag<Integer> bag;
 		for(String s : allVals) {
 			String[] temp = s.split(",");
@@ -60,17 +48,24 @@ public class WordNet {
 			}
 		}
 		
-		//synset size
-		_sizeSynset = (_synsetsToId.size() - 1);
 	}
 	
-	private void putInHyp(String[] allVals) {
+	private Digraph putInHyp(String hypernyms) {
+		if(hypernyms == null) {
+			throw new java.lang.IllegalArgumentException();
+		}
+		//instantiating _hypernyms with the size of _synsets 
+		_digraphHyper = new Digraph(_IdtoSynset.size());
+		   
+		In inHyp = new In(hypernyms);
+		String[] allVals = inHyp.readAllLines();
 		for(int i = 0; i < allVals.length; i++) {
 			String[] temp = allVals[i].split(",");
 			for(int j = 1; j < temp.length; j++) {
 				_digraphHyper.addEdge(i, Integer.parseInt(temp[j]));
 			}
 		}
+		return _digraphHyper;
 	}
 
 
